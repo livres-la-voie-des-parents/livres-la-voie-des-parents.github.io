@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maquette Tailwind CSS</title>
+  <!-- Chargement de Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <!-- Navbar -->
+  {% include navbar.html %}
+  <!-- Hero Section avec dégradé de couleurs -->
+  {% block hero %}
+  <section class="bg-gradient-to-r from-[#79c7b7] via-[#f1d681] to-[#ed8173]">
+    <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl font-extrabold text-white sm:text-5xl">Bienvenue sur notre site</h1>
+      <p class="mt-4 text-xl text-white">Découvrez nos fonctionnalités, nos offres et bien plus encore.</p>
+      <div class="mt-8">
+        <a href="#" class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-md text-lg font-medium hover:bg-indigo-700">En savoir plus</a>
+      </div>
+    </div>
+  </section>
+  {% endblock %}
+  <!-- Cards Section -->
+  {% block cards %}
+  <section class="py-12 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <img class="h-40 w-full object-cover rounded mb-4" src="https://via.placeholder.com/400x200" alt="Carte 1">
+          <h2 class="text-2xl font-bold mb-2">Carte 1</h2>
+          <p class="text-gray-600">Description rapide de la carte 1. Informations essentielles sur le contenu.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <img class="h-40 w-full object-cover rounded mb-4" src="https://via.placeholder.com/400x200" alt="Carte 2">
+          <h2 class="text-2xl font-bold mb-2">Carte 2</h2>
+          <p class="text-gray-600">Description rapide de la carte 2. Informations essentielles sur le contenu.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <img class="h-40 w-full object-cover rounded mb-4" src="https://via.placeholder.com/400x200" alt="Carte 3">
+          <h2 class="text-2xl font-bold mb-2">Carte 3</h2>
+          <p class="text-gray-600">Description rapide de la carte 3. Informations essentielles sur le contenu.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endblock %}
+
+  <!-- Accordion Section -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-lg shadow divide-y divide-gray-200">
+      <!-- Accordion Item 1 -->
+      <div class="p-6">
+        <button type="button" class="w-full flex justify-between items-center focus:outline-none" onclick="toggleAccordion('acc1')">
+          <span class="text-xl font-medium">Accordion 1</span>
+          <svg id="icon-acc1" class="w-6 h-6 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div id="acc1" class="mt-4 text-gray-600 hidden">
+          Contenu détaillé de l'Accordion 1.
+        </div>
+      </div>
+      <!-- Accordion Item 2 -->
+      <div class="p-6">
+        <button type="button" class="w-full flex justify-between items-center focus:outline-none" onclick="toggleAccordion('acc2')">
+          <span class="text-xl font-medium">Accordion 2</span>
+          <svg id="icon-acc2" class="w-6 h-6 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div id="acc2" class="mt-4 text-gray-600 hidden">
+          Contenu détaillé de l'Accordion 2.
+        </div>
+      </div>
+      <!-- Accordion Item 3 -->
+      <div class="p-6">
+        <button type="button" class="w-full flex justify-between items-center focus:outline-none" onclick="toggleAccordion('acc3')">
+          <span class="text-xl font-medium">Accordion 3</span>
+          <svg id="icon-acc3" class="w-6 h-6 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div id="acc3" class="mt-4 text-gray-600 hidden">
+          Contenu détaillé de l'Accordion 3.
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- Contact Form Section -->
+  <section class="py-12 bg-gray-100">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white p-8 rounded-lg shadow">
+        <h2 class="text-2xl font-bold mb-6">Contactez-nous</h2>
+        <form>
+          <div class="mb-4">
+            <label class="block text-gray-700">Nom</label>
+            <input type="text" class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Votre nom">
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700">Email</label>
+            <input type="email" class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Votre email">
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700">Message</label>
+            <textarea class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" rows="4" placeholder="Votre message"></textarea>
+          </div>
+          <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700">Envoyer</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  {% include footer.html %}
+  <!-- Script pour l'Accordion -->
+  <script>
+    function toggleAccordion(id) {
+      const content = document.getElementById(id);
+      const icon = document.getElementById("icon-" + id);
+      if (content.classList.contains("hidden")) {
+        content.classList.remove("hidden");
+        icon.classList.add("rotate-180");
+      } else {
+        content.classList.add("hidden");
+        icon.classList.remove("rotate-180");
+      }
+    }
+  </script>
+</body>
+</html>

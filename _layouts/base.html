@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maquette Tailwind CSS</title>
+  <!-- Chargement de Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <!-- Navbar -->
+  {% include navbar.html %}
+  <!-- Hero Section avec dégradé de couleurs -->
+  {% if page.hero %}
+  {{ page.hero }}
+  {% endif %}
+  <!-- Cards Section -->
+  {% if page.cards %}
+  {{ page.cards }}
+  {% endif %}
+  <!-- Footer -->
+  {% include footer.html %}
+</body>
+</html>

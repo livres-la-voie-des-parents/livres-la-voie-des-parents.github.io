@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz avec Image dimensionnable</title>
+  <style>
+    /* =========== STYLE MINIMALISTE + FLEX POUR L'IMAGE =========== */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #fafafa;
+    }
+    .slide {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;           /* pour aligner texte / image */
+      align-items: flex-start; /* aligne le haut de l'image et du contenu */
+    }
+    .slide-content {
+      flex: 1; /* le contenu texte prend la place disponible */
+    }
+    .slide-image {
+      margin-left: 20px;
+      object-fit: cover;
+    }
+
+    .nav-buttons {
+      margin-top: 20px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      color: #fff;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    .btn-validate {
+      background-color: #28a745;
+    }
+    .btn-back {
+      background-color: #6c757d;
+    }
+    .btn-next {
+      background-color: #007bff;
+    }
+    .promo-actions {
+      margin: 10px 0;
+    }
+    .promo-actions button,
+    .promo-actions a {
+      margin-right: 10px;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #17a2b8;
+      color: #fff;
+      text-decoration: none; /* pour les <a> */
+    }
+    .promo-actions button:hover,
+    .promo-actions a:hover {
+      background-color: #138496;
+    }
+    .answers label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .answers input[type="radio"] {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="quiz-container"></div>
+
+  <script>
+    /**************************************************************
+     * CONFIGURATION DU QUIZ
+     * "imageWidth" et "imageHeight" pour ajuster la taille
+     **************************************************************/
+    const quizConfig = {
+      slides: [
+      {
+          type: "intro",
+          title: "L'enfant dormira bientôt, et vous aussi - Quiz 2",
+          subtitle: "Le sommeil des enfants",
+          image: "/images/livre-sommeil.png",
+          content: "Ce quiz vous aidera à mieux comprendre les besoins de sommeil de votre enfant. À travers différentes questions, vous découvrirez des informations essentielles sur les cycles de sommeil, les signes de fatigue, et les bonnes pratiques pour favoriser un sommeil réparateur. Préparez-vous à en apprendre davantage et à améliorer la qualité du sommeil de votre enfant !",
+          imageWidth: "300px",
+          imageHeight: "300px"
+        },
+        {
+          "type": "question",
+          "id": 1,
+          "title": "0-6 mois",
+          "question": "Pourquoi les parents confondent-ils souvent le sommeil agité avec un réveil?",
+          "answers": [
+            { "text": "Parce que le bébé émet des sons et fait des mimiques", "isCorrect": true },
+            { "text": "Parce que le bébé ouvre grand les yeux", "isCorrect": false },
+            { "text": "Parce que le bébé dort profondément", "isCorrect": false },
+            { "text": "Parce que le bébé ne bouge pas du tout", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 2,
+          "title": "0-6 mois",
+          "question": "Comment peut-on distinguer un sommeil agité d'un simple réveil nocturne chez un bébé ?",
+          "answers": [
+            { "text": "Le bébé se réveille en pleurant fortement", "isCorrect": false },
+            { "text": "Le bébé dort profondément sans bouger", "isCorrect": false },
+            { "text": "Le bébé ouvre les yeux, pleure et semble inconfortable, mais retourne facilement au sommeil", "isCorrect": true },
+            { "text": "Le bébé dort sans faire de bruit", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 3,
+          "title": "L'horloge biologique",
+          "question": "Quel élément influence principalement l'horloge biologique de l'être humain?",
+          "answers": [
+            { "text": "L'alimentation", "isCorrect": false },
+            { "text": "La lumière naturelle", "isCorrect": true },
+            { "text": "L'activité physique", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 4,
+          "title": "L'horloge biologique",
+          "question": "Vrai ou faux : L'horloge biologique est mise en place dès la naissance",
+          "answers": [
+            { "text": "Vrai", "isCorrect": false },
+            { "text": "Faux", "isCorrect": true }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 5,
+          "title": "L'horloge biologique",
+          "question": "Quel terme désigne les cycles naturels d'éveil et de sommeil?",
+          "answers": [
+            { "text": "Le rythme circadien", "isCorrect": true },
+            { "text": "Le cycle lunaire", "isCorrect": false },
+            { "text": "Le rythme naturel", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          type: "promo",
+          title: "Page promo : Nos ateliers en ligne",
+          subtitle: "Sous‐titre promo",
+          content: "Bénéficiez d'une séance gratuite pour aller plus loin !",
+          actions: [
+            {
+              label: "Je m'abonne à la newsletter",
+              element: "button",
+              actionType: "callback",
+              functionName: "subscribeNewsletter"
+            },
+            {
+              label: "Visiter notre site",
+              element: "link",
+              actionType: "link",
+              url: "https://exemple.fr",
+              target: "_blank"
+            }
+          ],
+          image: "https://via.placeholder.com/200x250?text=Promo",
+          imageWidth: "200px",
+          imageHeight: "250px"
+        },
+        {
+          "type": "question",
+          "id": 6,
+          "title": "6-24 mois",
+          "question": "Quel est le rôle du sommeil paradoxal pour les enfants âgés de 6 mois à 2 ans ?",
+          "answers": [
+            { "text": "Il aide à la récupération physique", "isCorrect": false },
+            { "text": "Il joue un rôle fondamental dans la consolidation des apprentissages et émotions", "isCorrect": true },
+            { "text": "Il permet de renforcer le système immunitaire", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 7,
+          "title": "6-24 mois",
+          "question": "Quel est le \"bon\" signe de fatigue le plus évident chez un bébé de 6 à 9 mois?",
+          "answers": [
+            { "text": "Il mange moins", "isCorrect": false },
+            { "text": "Il se frotte les yeux", "isCorrect": true },
+            { "text": "Il réclame les bras", "isCorrect": false },
+            { "text": "Il cherche à jouer davantage", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 8,
+          "title": "Le rythme du sommeil",
+          "question": "Vrai ou faux : Les cycles de sommeil d'un enfant de 1 an sont d'environ 70 minutes?",
+          "answers": [
+            { "text": "Vrai", "isCorrect": true },
+            { "text": "Faux", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 9,
+          "title": "Le rythme du sommeil",
+          "question": "Quel est l'effet principal du sommeil profond sur le corps?",
+          "answers": [
+            { "text": "Il favorise la mémorisation.", "isCorrect": false },
+            { "text": "Phase réparatrice où le corps récupère intensément.", "isCorrect": true },
+            { "text": "Stimulation de l'activité cérébrale.", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          type: "promo",
+          title: "Ateliers pratiques",
+          content: "Inscrivez‐vous à nos ateliers pratiques sur le sommeil de bébé."
+        },
+        {
+          "type": "question",
+          "id": 10,
+          "title": "3 ans et +",
+          "question": "À partir de quel âge les cycles de sommeil des enfants passent-ils de 70 à 90 minutes?",
+          "answers": [
+            { "text": "Environ 1 an", "isCorrect": false },
+            { "text": "Environ 3 ans", "isCorrect": true },
+            { "text": "Environ 7 ans", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 11,
+          "title": "3 ans et +",
+          "question": "Quels sont les facteurs qui peuvent encore provoquer des réveils nocturnes chez les enfants de 3 ans et plus?",
+          "answers": [
+            { "text": "Les cauchemars et les changements dans la routine", "isCorrect": true },
+            { "text": "La faim ou la soif", "isCorrect": false },
+            { "text": "L'excès de sommeil pendant la journée", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          type: "result"
+        }
+      ],
+        "scoreRanges": [
+            {
+            "minScore": 0,
+            "maxScore": 4,
+            "title": "Vous êtes en pleine découverte !",
+            "message": "Bravo pour avoir pris le temps de faire ce quiz. Chaque parent commence son cheminement avec des questions, et c'est déjà un grand pas vers une meilleure compréhension des besoins de votre enfant. Continuez à vous informer, chaque effort compte pour créer un environnement sécurisant et aimant!"
+            },
+            {
+            "minScore": 5,
+            "maxScore": 8,
+            "title": "Vous êtes sur la bonne voie!",
+            "message": "Votre score montre que vous avez de bases solides sur les besoins fondamentaux et l'attachement. Il y a toujours de la place pour approfondir, et votre engagement pour en savoir plus est déjà un énorme cadeau pour votre enfant. Continuez ainsi, vous êtes un parent impliqué et attentionné!"
+            },
+            {
+            "minScore": 9,
+            "maxScore": 12,
+            "title": "Vous êtes un expert attentif!",
+            "message": "Félicitations, votre score montre une excellente compréhension de ces concepts essentiels. Vous avez une vraie sensibilité aux besoins de votre enfant et à l'importance de l'attachement. Continuez à cultiver ces connaissances et à les mettre en pratique dans votre quotidien familial. Vous êtes un pilier pour votre enfant!"
+            }
+        ]
+    };
+
+    /**************************************************************
+     * ETAT DU QUIZ
+     **************************************************************/
+    let currentSlideIndex = 0;
+    const userAnswers = {}; // idQuestion => index de la réponse
+
+    /**************************************************************
+     * FONCTIONS DE NAVIGATION
+     **************************************************************/
+    function gotoNextSlide() {
+      currentSlideIndex++;
+      if (currentSlideIndex >= quizConfig.slides.length) {
+        // On dépasse le dernier => slide de résultat virtuel
+        renderSlide({ type: 'result' });
+      } else {
+        renderSlide(quizConfig.slides[currentSlideIndex]);
+      }
+    }
+
+    function gotoPreviousSlide() {
+      if (currentSlideIndex > 0 && currentSlideIndex < quizConfig.slides.length) {
+        currentSlideIndex--;
+        renderSlide(quizConfig.slides[currentSlideIndex]);
+      }
+    }
+
+    /**************************************************************
+     * FONCTION PRINCIPALE DE RENDU DU SLIDE
+     **************************************************************/
+    function renderSlide(slide) {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      // Conteneur global
+      const slideDiv = document.createElement('div');
+      slideDiv.className = 'slide';
+
+      // Sous‐conteneur pour le contenu (texte, etc.)
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'slide-content';
+      slideDiv.appendChild(contentDiv);
+
+      // Ajout de l'image à droite si présente
+      if (slide.image) {
+        const imageEl = document.createElement('img');
+        imageEl.src = slide.image;
+        imageEl.alt = "Illustration";
+        imageEl.className = 'slide-image';
+
+        // Application dynamique de la taille
+        if (slide.imageWidth) {
+          imageEl.style.width = slide.imageWidth;
+        }
+        if (slide.imageHeight) {
+          imageEl.style.height = slide.imageHeight;
+        }
+
+        slideDiv.appendChild(imageEl);
+      }
+
+      // Selon le type, on remplit contentDiv
+      switch (slide.type) {
+        case 'intro':
+        case 'promo':
+        case 'question':
+          {
+            // Titre principal
+            const titleEl = document.createElement('h2');
+            titleEl.textContent = slide.title;
+            contentDiv.appendChild(titleEl);
+
+            // Sous‐titre facultatif
+            if (slide.subtitle) {
+              const subtitleEl = document.createElement('h3');
+              subtitleEl.textContent = slide.subtitle;
+              contentDiv.appendChild(subtitleEl);
+            }
+
+            // Si c'est une question
+            if (slide.type === 'question') {
+              const questionP = document.createElement('p');
+              questionP.textContent = slide.question;
+              contentDiv.appendChild(questionP);
+
+              const answersDiv = document.createElement('div');
+              answersDiv.className = 'answers';
+
+              slide.answers.forEach((ans, idx) => {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `answer-q${slide.id}`;
+                radio.value = idx;
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(ans.text));
+                answersDiv.appendChild(label);
+              });
+              contentDiv.appendChild(answersDiv);
+
+              // Restaure la sélection si l'utilisateur a déjà répondu
+              if (userAnswers[slide.id] !== undefined) {
+                const storedRadio = answersDiv.querySelector(`input[value="${userAnswers[slide.id]}"]`);
+                if (storedRadio) {
+                  storedRadio.checked = true;
+                }
+              }
+
+              const navDiv = document.createElement('div');
+              navDiv.className = 'nav-buttons';
+
+              // Bouton "Précédent" si pas le premier slide
+              if (currentSlideIndex > 0) {
+                const backBtn = document.createElement('button');
+                backBtn.textContent = 'Précédent';
+                backBtn.className = 'btn-back';
+                backBtn.addEventListener('click', gotoPreviousSlide);
+                navDiv.appendChild(backBtn);
+              }
+
+              // Bouton "Valider"
+              const validateBtn = document.createElement('button');
+              validateBtn.textContent = 'Valider';
+              validateBtn.className = 'btn-validate';
+              validateBtn.addEventListener('click', () => {
+                // Enregistre la réponse cochée
+                const chosen = answersDiv.querySelector('input[type="radio"]:checked');
+                if (!chosen) {
+                  alert('Veuillez sélectionner une réponse.');
+                  return;
+                }
+                userAnswers[slide.id] = parseInt(chosen.value, 10);
+                gotoNextSlide();
+              });
+              navDiv.appendChild(validateBtn);
+
+              contentDiv.appendChild(navDiv);
+            }
+            else {
+              // "intro" ou "promo"
+              const textContentP = document.createElement('p');
+              textContentP.textContent = slide.content || '';
+              contentDiv.appendChild(textContentP);
+
+              // Si c'est un promo, on peut avoir des actions
+              if (slide.type === 'promo' && slide.actions && Array.isArray(slide.actions)) {
+                const actionsContainer = document.createElement('div');
+                actionsContainer.className = 'promo-actions';
+
+                slide.actions.forEach(action => {
+                  let actionEl;
+                  if (action.element === 'link') {
+                    actionEl = document.createElement('a');
+                    actionEl.href = action.url || '#';
+                    actionEl.target = action.target || '_self';
+                  } else {
+                    actionEl = document.createElement('button');
+                  }
+                  actionEl.textContent = action.label;
+
+                  // Type de l'action
+                  if (action.actionType === 'callback') {
+                    actionEl.addEventListener('click', evt => {
+                      evt.preventDefault();
+                      if (typeof window[action.functionName] === 'function') {
+                        window[action.functionName]();
+                      }
+                    });
+                  }
+                  else if (action.actionType === 'link') {
+                    if (action.element === 'button') {
+                      actionEl.addEventListener('click', evt => {
+                        evt.preventDefault();
+                        if (action.target === '_blank') {
+                          window.open(action.url, '_blank');
+                        } else {
+                          window.location.href = action.url;
+                        }
+                      });
+                    }
+                  }
+                  actionsContainer.appendChild(actionEl);
+                });
+
+                contentDiv.appendChild(actionsContainer);
+              }
+
+              // Boutons nav
+              const navDiv = document.createElement('div');
+              navDiv.className = 'nav-buttons';
+
+              // Bouton Précédent
+              if (currentSlideIndex > 0) {
+                const backBtn = document.createElement('button');
+                backBtn.textContent = 'Précédent';
+                backBtn.className = 'btn-back';
+                backBtn.addEventListener('click', gotoPreviousSlide);
+                navDiv.appendChild(backBtn);
+              }
+
+              // Bouton suivant
+              const nextBtn = document.createElement('button');
+              nextBtn.textContent = 'Suite';
+              nextBtn.className = 'btn-next';
+              nextBtn.addEventListener('click', gotoNextSlide);
+              navDiv.appendChild(nextBtn);
+
+              contentDiv.appendChild(navDiv);
+            }
+          }
+          break;
+
+        case 'result':
+          {
+            const finalScore = computeScore();
+            const range = getScoreRange(finalScore);
+
+            const resultTitle = document.createElement('h2');
+            resultTitle.textContent = range.title;
+            contentDiv.appendChild(resultTitle);
+
+            const resultMsg = document.createElement('p');
+            resultMsg.textContent = range.message + ` (Votre score : ${finalScore})`;
+            contentDiv.appendChild(resultMsg);
+
+            const restartBtn = document.createElement('button');
+            restartBtn.textContent = 'Recommencer';
+            restartBtn.className = 'btn-next';
+            restartBtn.addEventListener('click', () => {
+              currentSlideIndex = 0;
+              for (let key in userAnswers) {
+                delete userAnswers[key];
+              }
+              renderSlide(quizConfig.slides[currentSlideIndex]);
+            });
+            contentDiv.appendChild(restartBtn);
+          }
+          break;
+      }
+
+      container.appendChild(slideDiv);
+    }
+
+    /**************************************************************
+     * CALCUL DU SCORE FINAL
+     **************************************************************/
+    function computeScore() {
+      let score = 0;
+      quizConfig.slides.forEach(slide => {
+        if (slide.type === 'question') {
+          const qId = slide.id;
+          const userChoice = userAnswers[qId];
+          if (userChoice !== undefined) {
+            if (slide.answers[userChoice].isCorrect) {
+              score++;
+            }
+          }
+        }
+      });
+      return score;
+    }
+
+    /**************************************************************
+     * TROUVER LE PALIER DE SCORE
+     **************************************************************/
+    function getScoreRange(score) {
+      const found = quizConfig.scoreRanges.find(r => score >= r.minScore && score <= r.maxScore);
+      return found || { title: "Score inconnu", message: "Aucun texte adapté." };
+    }
+
+    /**************************************************************
+     * EXEMPLE DE FONCTION CALLBACK
+     **************************************************************/
+    function subscribeNewsletter() {
+      alert("Vous allez être redirigé vers la page d'inscription à la newsletter !");
+      window.location.href = 'https://exemple.fr/newsletter';
+    }
+
+    /**************************************************************
+     * INITIALISATION DU QUIZ
+     **************************************************************/
+    renderSlide(quizConfig.slides[currentSlideIndex]);
+  </script>
+</body>
+</html>
+

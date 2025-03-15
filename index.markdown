@@ -21,7 +21,7 @@ hero: |
                             <h1 class="text-4xl font-extrabold text-gray-900">La Librairie<br>Des<br>Parents</h1>
                             <p class="mt-4 text-xl text-gray-700">Chaque mois, Coralie, co-fondatrice de <a href="https://www.la-voie-des-parents.fr" class="text-indigo-600 hover:text-indigo-400">la voie des parents</a> (et lectrice assidue en chef) choisie un livre qui met les parents au centre de l'histoire.</p>
                             <div class="mt-8">
-                                <a href="/about/" class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-md text-lg font-medium hover:bg-indigo-700">En savoir plus</a>
+                                <a href="/lenfant-dormira-bientot-et-vous-aussi-guide-du-sommeil.html" class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-md text-lg font-medium hover:bg-indigo-700">Notre livre sur le sommeil de l'enfant</a>
                             </div>
                         </div>
                     </div>    

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz avec Image dimensionnable</title>
+  <style>
+    /* =========== STYLE MINIMALISTE + FLEX POUR L'IMAGE =========== */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #fafafa;
+    }
+    .slide {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;           /* pour aligner texte / image */
+      align-items: flex-start; /* aligne le haut de l'image et du contenu */
+    }
+    .slide-content {
+      flex: 1; /* le contenu texte prend la place disponible */
+    }
+    .slide-image {
+      margin-left: 20px;
+      object-fit: cover;
+    }
+
+    .nav-buttons {
+      margin-top: 20px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      color: #fff;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    .btn-validate {
+      background-color: #28a745;
+    }
+    .btn-back {
+      background-color: #6c757d;
+    }
+    .btn-next {
+      background-color: #007bff;
+    }
+    .promo-actions {
+      margin: 10px 0;
+    }
+    .promo-actions button,
+    .promo-actions a {
+      margin-right: 10px;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #17a2b8;
+      color: #fff;
+      text-decoration: none; /* pour les <a> */
+    }
+    .promo-actions button:hover,
+    .promo-actions a:hover {
+      background-color: #138496;
+    }
+    .answers label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .answers input[type="radio"] {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="quiz-container"></div>
+
+  <script>
+    /**************************************************************
+     * CONFIGURATION DU QUIZ
+     * "imageWidth" et "imageHeight" pour ajuster la taille
+     **************************************************************/
+    const quizConfig = {
+      slides: [
+        {
+          type: "intro",
+          title: "L'enfant dormira bientôt, et vous aussi - Quiz 1",
+          subtitle: "Les besoins fondamentaux et la théorie de l'attachement",
+          content: "Ce quiz vous aidera à comprendre les besoins fondamentaux de l'enfant et la théorie de l'attachement pour mieux accompagner votre enfant dans son développement.",
+          image: "/images/livre-sommeil.png",
+          imageWidth: "300px",
+          imageHeight: "300px"
+        },
+        {
+          "type": "question",
+          "id": 1,
+          "title": "Les besoins fondamentaux de l'enfant",
+          "question": "Parmi ces besoins, lequel n'est pas un besoin fondamental selon les théories du développement de l'enfant?",
+          "answers": [
+            { "text": "La sécurité affective", "isCorrect": false },
+            { "text": "Le besoin d'autonomie", "isCorrect": false },
+            { "text": "Le besoin d'être stimulé en permanence", "isCorrect": true }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 2,
+          "title": "Les besoins fondamentaux de l'enfant",
+          "question": "Qu'est-ce qui favorise principalement un sentiment de sécurité chez un jeune enfant?",
+          "answers": [
+            { "text": "La présence constante de la même personne pour s'occuper de lui", "isCorrect": false },
+            { "text": "Une routine stable et prévisible", "isCorrect": true },
+            { "text": "Des activités variées pour éviter l'ennui et être stimulé", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 3,
+          "title": "Les besoins fondamentaux de l'enfant",
+          "question": "Vrai ou faux : Les besoins fondamentaux d'un enfant évoluent selon son âge et développement.",
+          "answers": [
+            { "text": "Vrai", "isCorrect": true },
+            { "text": "Faux", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 4,
+          "title": "Les besoins fondamentaux de l'enfant",
+          "question": "Lorsque les besoins fondamentaux d'un enfant ne sont pas satisfaits, cela peut entraîner:",
+          "answers": [
+            { "text": "Une simple phase temporaire sans conséquence (il est petit, il ne comprend pas).", "isCorrect": false },
+            { "text": "Des perturbations émotionnelles, relationnelles et comportementales.", "isCorrect": true },
+            { "text": "Une accélération du développement de son autonomie.", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          type: "promo",
+          title: "Page promo : Nos ateliers en ligne",
+          subtitle: "Sous‐titre promo",
+          content: "Bénéficiez d'une séance gratuite pour aller plus loin !",
+          actions: [
+            {
+              label: "Je m'abonne à la newsletter",
+              element: "button",
+              actionType: "callback",
+              functionName: "subscribeNewsletter"
+            },
+            {
+              label: "Visiter notre site",
+              element: "link",
+              actionType: "link",
+              url: "https://exemple.fr",
+              target: "_blank"
+            }
+          ],
+          image: "https://via.placeholder.com/200x250?text=Promo",
+          imageWidth: "200px",
+          imageHeight: "250px"
+        },
+        {
+          "type": "question",
+          "id": 5,
+          "title": "La théorie de l'attachement",
+          "question": "La figure d'attachement principal suffisamment sécure alors il n'y a pas besoin d'une figure d'attachement secondaire?",
+          "answers": [
+            { "text": "Vrai", "isCorrect": false },
+            { "text": "Faux", "isCorrect": true }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 6,
+          "title": "La théorie de l'attachement",
+          "question": "Selon la théorie de l'attachement, un lien d'attachement sécurisant se développe grâce à:",
+          "answers": [
+            { "text": "La réponse rapide et cohérente aux besoins de l'enfant.", "isCorrect": true },
+            { "text": "L'exposition précoce à des situations stressantes pour habituer l'enfant.", "isCorrect": false },
+            { "text": "La capacité de l'enfant à se calmer seul dès la naissance.", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 7,
+          "title": "La théorie de l'attachement",
+          "question": "Vrai ou faux : Un enfant peut avoir plusieurs figures d'attachement.",
+          "answers": [
+            { "text": "Vrai", "isCorrect": true },
+            { "text": "Faux", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 8,
+          "title": "La théorie de l'attachement",
+          "question": "L'un des rôles principaux d'une figure d'attachement est d'offrir un sentiment de protection et de sécurité.",
+          "answers": [
+            { "text": "Vrai", "isCorrect": true },
+            { "text": "Faux", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          type: "promo",
+          title: "Ateliers pratiques",
+          content: "Inscrivez‐vous à nos ateliers pratiques sur le sommeil de bébé."
+        },
+        {
+          "type": "question",
+          "id": 9,
+          "title": "Figures d'attachement principales et secondaires",
+          "question": "Quel est le rôle principal de la figure d'attachement secondaire ?",
+          "answers": [
+            { "text": "Remplacer complètement la figure principale.", "isCorrect": false },
+            { "text": "Apporter une présence complémentaire et rassurante en cas d'indisponibilité de la figure principale.", "isCorrect": true },
+            { "text": "Instaurer des routines radicalement différentes pour diversifier l'expérience de l'enfant.", "isCorrect": false },
+            { "text": "S'occuper uniquement des aspects pratiques, sans implication émotionnelle.", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 10,
+          "title": "Figures d'attachement principales et secondaires",
+          "question": "Pourquoi est-il important d'assurer cohérence entre la figure principale et la figure secondaire?",
+          "answers": [
+            { "text": "Pour garantir une continuité émotionnelle et un cadre visible pour l'enfant.", "isCorrect": true },
+            { "text": "Pour éviter que l'enfant développe un attachement secondaire trop fort.", "isCorrect": false },
+            { "text": "Pour réduire les interactions avec la figure principale.", "isCorrect": false },
+            { "text": "Pour diminuer le besoin d'adaptation de l'enfant.", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 11,
+          "title": "Figures d'attachement principales et secondaires",
+          "question": "Vrai ou faux : Un enfant peut changer de figure d'attachement principal au cours de sa vie.",
+          "answers": [
+            { "text": "Vrai", "isCorrect": true },
+            { "text": "Faux", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          "type": "question",
+          "id": 12,
+          "title": "Figures d'attachement principales et secondaires",
+          "question": "Quelle pratique peut renforcer la collaboration entre les figures d'attachement?",
+          "answers": [
+            { "text": "Une verbalisation ouverte et une adaptation continue des routines selon les besoins de l'enfant.", "isCorrect": true },
+            { "text": "Une séparation stricte des tâches pour éviter toute confusion.", "isCorrect": false },
+            { "text": "Une absence de communication sur les approches respectives.", "isCorrect": false },
+            { "text": "Un changement constant des rituels pour tester la résilience de l'enfant.", "isCorrect": false }
+          ],
+          "image": "",
+          "imageWidth": ""
+        },
+        {
+          type: "result"
+        }
+      ],
+        "scoreRanges": [
+            {
+            "minScore": 0,
+            "maxScore": 3,
+            "title": "Vous êtes en pleine découverte !",
+            "message": "Bravo d'avoir pris le temps de faire ce quiz ! Chaque parent commence par poser des questions, et c'est déjà un grand pas vers une meilleure compréhension du rythme du sommeil et de l'horloge biologique. Vous êtes sur la bonne voie, continuez à explorer et à approfondir ces connaissances pour mieux accompagner votre enfant dans ses besoins de sommeil."
+            },
+            {
+            "minScore": 4,
+            "maxScore": 7,
+            "title": "Vous êtes sur la bonne voie !",
+            "message": "Votre score montre que vous avez des bases solides concernant le rythme du sommeil et l'horloge biologique. Il reste encore des aspects à approfondir, mais vous êtes déjà bien informé et engagé dans le processus. Continuez ainsi, vous êtes un parent attentionné et impliqué dans le bien-être de votre famille!"
+            },
+            {
+            "minScore": 8,
+            "maxScore": 11,
+            "title": "Vous êtes un expert attentif !",
+            "message": "Félicitations, vous avez une très bonne compréhension de l'horloge biologique et des besoins de sommeil ! Votre sensibilité et vos connaissances vous permettent de créer un environnement adapté au rythme de votre enfant. Vous êtes un pilier pour son bien-être et son développement. Continuez à appliquer ces savoirs dans votre quotidien!"
+            }
+        ]
+    };
+
+    /**************************************************************
+     * ETAT DU QUIZ
+     **************************************************************/
+    let currentSlideIndex = 0;
+    const userAnswers = {}; // idQuestion => index de la réponse
+
+    /**************************************************************
+     * FONCTIONS DE NAVIGATION
+     **************************************************************/
+    function gotoNextSlide() {
+      currentSlideIndex++;
+      if (currentSlideIndex >= quizConfig.slides.length) {
+        // On dépasse le dernier => slide de résultat virtuel
+        renderSlide({ type: 'result' });
+      } else {
+        renderSlide(quizConfig.slides[currentSlideIndex]);
+      }
+    }
+
+    function gotoPreviousSlide() {
+      if (currentSlideIndex > 0 && currentSlideIndex < quizConfig.slides.length) {
+        currentSlideIndex--;
+        renderSlide(quizConfig.slides[currentSlideIndex]);
+      }
+    }
+
+    /**************************************************************
+     * FONCTION PRINCIPALE DE RENDU DU SLIDE
+     **************************************************************/
+    function renderSlide(slide) {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      // Conteneur global
+      const slideDiv = document.createElement('div');
+      slideDiv.className = 'slide';
+
+      // Sous‐conteneur pour le contenu (texte, etc.)
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'slide-content';
+      slideDiv.appendChild(contentDiv);
+
+      // Ajout de l'image à droite si présente
+      if (slide.image) {
+        const imageEl = document.createElement('img');
+        imageEl.src = slide.image;
+        imageEl.alt = "Illustration";
+        imageEl.className = 'slide-image';
+
+        // Application dynamique de la taille
+        if (slide.imageWidth) {
+          imageEl.style.width = slide.imageWidth;
+        }
+        if (slide.imageHeight) {
+          imageEl.style.height = slide.imageHeight;
+        }
+
+        slideDiv.appendChild(imageEl);
+      }
+
+      // Selon le type, on remplit contentDiv
+      switch (slide.type) {
+        case 'intro':
+        case 'promo':
+        case 'question':
+          {
+            // Titre principal
+            const titleEl = document.createElement('h2');
+            titleEl.textContent = slide.title;
+            contentDiv.appendChild(titleEl);
+
+            // Sous‐titre facultatif
+            if (slide.subtitle) {
+              const subtitleEl = document.createElement('h3');
+              subtitleEl.textContent = slide.subtitle;
+              contentDiv.appendChild(subtitleEl);
+            }
+
+            // Si c'est une question
+            if (slide.type === 'question') {
+              const questionP = document.createElement('p');
+              questionP.textContent = slide.question;
+              contentDiv.appendChild(questionP);
+
+              const answersDiv = document.createElement('div');
+              answersDiv.className = 'answers';
+
+              slide.answers.forEach((ans, idx) => {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `answer-q${slide.id}`;
+                radio.value = idx;
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(ans.text));
+                answersDiv.appendChild(label);
+              });
+              contentDiv.appendChild(answersDiv);
+
+              // Restaure la sélection si l'utilisateur a déjà répondu
+              if (userAnswers[slide.id] !== undefined) {
+                const storedRadio = answersDiv.querySelector(`input[value="${userAnswers[slide.id]}"]`);
+                if (storedRadio) {
+                  storedRadio.checked = true;
+                }
+              }
+
+              const navDiv = document.createElement('div');
+              navDiv.className = 'nav-buttons';
+
+              // Bouton "Précédent" si pas le premier slide
+              if (currentSlideIndex > 0) {
+                const backBtn = document.createElement('button');
+                backBtn.textContent = 'Précédent';
+                backBtn.className = 'btn-back';
+                backBtn.addEventListener('click', gotoPreviousSlide);
+                navDiv.appendChild(backBtn);
+              }
+
+              // Bouton "Valider"
+              const validateBtn = document.createElement('button');
+              validateBtn.textContent = 'Valider';
+              validateBtn.className = 'btn-validate';
+              validateBtn.addEventListener('click', () => {
+                // Enregistre la réponse cochée
+                const chosen = answersDiv.querySelector('input[type="radio"]:checked');
+                if (!chosen) {
+                  alert('Veuillez sélectionner une réponse.');
+                  return;
+                }
+                userAnswers[slide.id] = parseInt(chosen.value, 10);
+                gotoNextSlide();
+              });
+              navDiv.appendChild(validateBtn);
+
+              contentDiv.appendChild(navDiv);
+            }
+            else {
+              // "intro" ou "promo"
+              const textContentP = document.createElement('p');
+              textContentP.textContent = slide.content || '';
+              contentDiv.appendChild(textContentP);
+
+              // Si c'est un promo, on peut avoir des actions
+              if (slide.type === 'promo' && slide.actions && Array.isArray(slide.actions)) {
+                const actionsContainer = document.createElement('div');
+                actionsContainer.className = 'promo-actions';
+
+                slide.actions.forEach(action => {
+                  let actionEl;
+                  if (action.element === 'link') {
+                    actionEl = document.createElement('a');
+                    actionEl.href = action.url || '#';
+                    actionEl.target = action.target || '_self';
+                  } else {
+                    actionEl = document.createElement('button');
+                  }
+                  actionEl.textContent = action.label;
+
+                  // Type de l'action
+                  if (action.actionType === 'callback') {
+                    actionEl.addEventListener('click', evt => {
+                      evt.preventDefault();
+                      if (typeof window[action.functionName] === 'function') {
+                        window[action.functionName]();
+                      }
+                    });
+                  }
+                  else if (action.actionType === 'link') {
+                    if (action.element === 'button') {
+                      actionEl.addEventListener('click', evt => {
+                        evt.preventDefault();
+                        if (action.target === '_blank') {
+                          window.open(action.url, '_blank');
+                        } else {
+                          window.location.href = action.url;
+                        }
+                      });
+                    }
+                  }
+                  actionsContainer.appendChild(actionEl);
+                });
+
+                contentDiv.appendChild(actionsContainer);
+              }
+
+              // Boutons nav
+              const navDiv = document.createElement('div');
+              navDiv.className = 'nav-buttons';
+
+              // Bouton Précédent
+              if (currentSlideIndex > 0) {
+                const backBtn = document.createElement('button');
+                backBtn.textContent = 'Précédent';
+                backBtn.className = 'btn-back';
+                backBtn.addEventListener('click', gotoPreviousSlide);
+                navDiv.appendChild(backBtn);
+              }
+
+              // Bouton suivant
+              const nextBtn = document.createElement('button');
+              nextBtn.textContent = 'Suite';
+              nextBtn.className = 'btn-next';
+              nextBtn.addEventListener('click', gotoNextSlide);
+              navDiv.appendChild(nextBtn);
+
+              contentDiv.appendChild(navDiv);
+            }
+          }
+          break;
+
+        case 'result':
+          {
+            const finalScore = computeScore();
+            const range = getScoreRange(finalScore);
+
+            const resultTitle = document.createElement('h2');
+            resultTitle.textContent = range.title;
+            contentDiv.appendChild(resultTitle);
+
+            const resultMsg = document.createElement('p');
+            resultMsg.textContent = range.message + ` (Votre score : ${finalScore})`;
+            contentDiv.appendChild(resultMsg);
+
+            const restartBtn = document.createElement('button');
+            restartBtn.textContent = 'Recommencer';
+            restartBtn.className = 'btn-next';
+            restartBtn.addEventListener('click', () => {
+              currentSlideIndex = 0;
+              for (let key in userAnswers) {
+                delete userAnswers[key];
+              }
+              renderSlide(quizConfig.slides[currentSlideIndex]);
+            });
+            contentDiv.appendChild(restartBtn);
+          }
+          break;
+      }
+
+      container.appendChild(slideDiv);
+    }
+
+    /**************************************************************
+     * CALCUL DU SCORE FINAL
+     **************************************************************/
+    function computeScore() {
+      let score = 0;
+      quizConfig.slides.forEach(slide => {
+        if (slide.type === 'question') {
+          const qId = slide.id;
+          const userChoice = userAnswers[qId];
+          if (userChoice !== undefined) {
+            if (slide.answers[userChoice].isCorrect) {
+              score++;
+            }
+          }
+        }
+      });
+      return score;
+    }
+
+    /**************************************************************
+     * TROUVER LE PALIER DE SCORE
+     **************************************************************/
+    function getScoreRange(score) {
+      const found = quizConfig.scoreRanges.find(r => score >= r.minScore && score <= r.maxScore);
+      return found || { title: "Score inconnu", message: "Aucun texte adapté." };
+    }
+
+    /**************************************************************
+     * EXEMPLE DE FONCTION CALLBACK
+     **************************************************************/
+    function subscribeNewsletter() {
+      alert("Vous allez être redirigé vers la page d'inscription à la newsletter !");
+      window.location.href = 'https://exemple.fr/newsletter';
+    }
+
+    /**************************************************************
+     * INITIALISATION DU QUIZ
+     **************************************************************/
+    renderSlide(quizConfig.slides[currentSlideIndex]);
+  </script>
+</body>
+</html>
+

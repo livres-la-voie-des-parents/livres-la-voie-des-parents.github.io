@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title }}</title>
+  <!-- Chargement de Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* =========== STYLE MINIMALISTE + FLEX POUR L'IMAGE =========== */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .slide {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;           /* pour aligner texte / image */
+      align-items: flex-start; /* aligne le haut de l'image et du contenu */
+    }
+    .slide-content {
+      flex: 1; /* le contenu texte prend la place disponible */
+    }
+    .slide-image {
+      margin-left: 20px;
+      object-fit: cover;
+    }
+    @media (max-width: 640px) {
+      .slide-image {
+        display: none;
+      }
+      .footer {
+        position: static;
+      }
+    }
+
+    .nav-buttons {
+      margin-top: 20px;
+    }
+    .promo-actions {
+      margin: 10px 0;
+    }
+    .promo-actions button,
+    .promo-actions a {
+      margin-right: 10px;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #17a2b8;
+      color: #fff;
+      text-decoration: none; /* pour les <a> */
+    }
+    .promo-actions button:hover,
+    .promo-actions a:hover {
+      background-color: #138496;
+    }
+    .answers label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .answers input[type="radio"] {
+      margin-right: 8px;
+    }
+    .content {
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+      height: 100%;
+    }
+    @media (min-width: 641px) {
+      .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  
+  <!-- Hero Section avec dégradé de couleurs -->
+
+  
+
+  <!-- Navbar -->
+  {% include navbar.html %}
+  
+  <div class="mt-4 h-full mx-auto content" id="quiz-container"></div>
+
+
+  <!-- Footer -->
+  <div class="footer">
+    {% include footer.html %}
+  </div>
+  <script>
+    /**************************************************************
+     * CONFIGURATION DU QUIZ
+     **************************************************************/
+    const quizConfig = {{ page.quiz_config | jsonify }};
+
+    /**************************************************************
+     * ETAT DU QUIZ
+     **************************************************************/
+    let currentSlideIndex = 0;
+    const userAnswers = {}; // idQuestion => index de la réponse
+
+    /**************************************************************
+     * FONCTIONS DE NAVIGATION
+     **************************************************************/
+    function gotoNextSlide() {
+      currentSlideIndex++;
+      if (currentSlideIndex >= quizConfig.slides.length) {
+        // On dépasse le dernier => slide de résultat virtuel
+        renderSlide({ type: 'result' });
+      } else {
+        renderSlide(quizConfig.slides[currentSlideIndex]);
+      }
+    }
+
+    function gotoPreviousSlide() {
+      if (currentSlideIndex > 0 && currentSlideIndex < quizConfig.slides.length) {
+        currentSlideIndex--;
+        renderSlide(quizConfig.slides[currentSlideIndex]);
+      }
+    }
+
+    /**************************************************************
+     * FONCTION PRINCIPALE DE RENDU DU SLIDE
+     **************************************************************/
+    function renderSlide(slide) {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      // Conteneur global
+      const slideDiv = document.createElement('div');
+      slideDiv.className = 'slide';
+
+      // Sous‐conteneur pour le contenu (texte, etc.)
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'slide-content';
+      slideDiv.appendChild(contentDiv);
+
+      // Ajout de l'image à droite si présente
+      if (slide.image) {
+        const imageEl = document.createElement('img');
+        imageEl.src = slide.image;
+        imageEl.alt = "Illustration";
+        imageEl.className = 'slide-image';
+
+        // Application dynamique de la taille
+        if (slide.imageWidth) {
+          imageEl.style.width = slide.imageWidth;
+        }
+        if (slide.imageHeight) {
+          imageEl.style.height = slide.imageHeight;
+        }
+
+        slideDiv.appendChild(imageEl);
+      }
+
+      // Selon le type, on remplit contentDiv
+      switch (slide.type) {
+        case 'intro':
+        case 'promo':
+        case 'question':
+          {
+            // Titre principal
+            const titleEl = document.createElement('h2');
+            titleEl.className = 'text-3xl font-bold';
+            titleEl.textContent = slide.title;
+            contentDiv.appendChild(titleEl);
+
+            // Sous‐titre facultatif
+            if (slide.subtitle) {
+              const subtitleEl = document.createElement('h3');
+              subtitleEl.className = 'text-2xl mt-4 mb-4';
+              subtitleEl.textContent = slide.subtitle;
+              contentDiv.appendChild(subtitleEl);
+            }
+
+            // Si c'est une question
+            if (slide.type === 'question') {
+              const questionP = document.createElement('p');
+              questionP.className = 'text-xl my-10';
+              questionP.textContent = slide.question;
+              contentDiv.appendChild(questionP);
+
+              const answersDiv = document.createElement('div');
+              answersDiv.className = 'answers';
+
+              slide.answers.forEach((ans, idx) => {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `answer-q${slide.id}`;
+                radio.value = idx;
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(ans.text));
+                answersDiv.appendChild(label);
+              });
+              contentDiv.appendChild(answersDiv);
+
+              // Restaure la sélection si l'utilisateur a déjà répondu
+              if (userAnswers[slide.id] !== undefined) {
+                const storedRadio = answersDiv.querySelector(`input[value="${userAnswers[slide.id]}"]`);
+                if (storedRadio) {
+                  storedRadio.checked = true;
+                }
+              }
+
+              const navDiv = document.createElement('div');
+              navDiv.className = 'nav-buttons';
+
+              // Bouton "Précédent" si pas le premier slide
+              if (currentSlideIndex > 0) {
+                const backBtn = document.createElement('button');
+                backBtn.textContent = 'Précédent';
+                backBtn.className = 'btn-back bg-gray-600 text-white py-2 px-4 rounded mr-2';
+                backBtn.addEventListener('click', gotoPreviousSlide);
+                navDiv.appendChild(backBtn);
+              }
+
+              // Bouton "Valider"
+              const validateBtn = document.createElement('button');
+              validateBtn.textContent = 'Valider';
+              validateBtn.className = 'btn-validate bg-green-600 text-white py-2 px-4 rounded';
+              validateBtn.addEventListener('click', () => {
+                // Enregistre la réponse cochée
+                const chosen = answersDiv.querySelector('input[type="radio"]:checked');
+                if (!chosen) {
+                  alert('Veuillez sélectionner une réponse.');
+                  return;
+                }
+                userAnswers[slide.id] = parseInt(chosen.value, 10);
+                gotoNextSlide();
+              });
+              navDiv.appendChild(validateBtn);
+
+              contentDiv.appendChild(navDiv);
+            }
+            else {
+              // "intro" ou "promo"
+              const textContentP = document.createElement('p');
+              textContentP.textContent = slide.content || '';
+              textContentP.className = 'text-xl';
+              contentDiv.appendChild(textContentP);
+
+              // Si c'est un promo, on peut avoir des actions
+              if (slide.type === 'promo' && slide.actions && Array.isArray(slide.actions)) {
+                const actionsContainer = document.createElement('div');
+                actionsContainer.className = 'promo-actions';
+
+                slide.actions.forEach(action => {
+                  let actionEl;
+                  if (action.element === 'link') {
+                    actionEl = document.createElement('a');
+                    actionEl.href = action.url || '#';
+                    actionEl.target = action.target || '_self';
+                    actionEl.className = 'bg-teal-600 text-white py-2 px-4 rounded text-2xl';
+                  } else {
+                    actionEl = document.createElement('button');
+                    actionEl.className = 'bg-teal-600 text-white py-2 px-4 rounded text-2xl';
+                  }
+                  actionEl.textContent = action.label;
+
+                  // Type de l'action
+                  if (action.actionType === 'callback') {
+                    actionEl.addEventListener('click', evt => {
+                      evt.preventDefault();
+                      if (typeof window[action.functionName] === 'function') {
+                        window[action.functionName]();
+                      }
+                    });
+                  }
+                  else if (action.actionType === 'link') {
+                    if (action.element === 'button') {
+                      actionEl.addEventListener('click', evt => {
+                        evt.preventDefault();
+                        if (action.target === '_blank') {
+                          window.open(action.url, '_blank');
+                        } else {
+                          window.location.href = action.url;
+                        }
+                      });
+                    }
+                  }
+                  actionsContainer.appendChild(actionEl);
+                });
+
+                contentDiv.appendChild(actionsContainer);
+              }
+
+              // Boutons nav
+              const navDiv = document.createElement('div');
+              navDiv.className = 'nav-buttons';
+
+              // Bouton Précédent
+              if (currentSlideIndex > 0) {
+                const backBtn = document.createElement('button');
+                backBtn.textContent = 'Précédent';
+                backBtn.className = 'btn-back bg-gray-600 text-white py-2 px-4 rounded mr-2';
+                backBtn.addEventListener('click', gotoPreviousSlide);
+                navDiv.appendChild(backBtn);
+              }
+
+              // Bouton suivant
+              const nextBtn = document.createElement('button');
+              switch (slide.type) {
+                case 'intro':
+                  nextBtn.textContent = 'Commencer le quiz';
+                  break;
+                case 'promo':
+                  nextBtn.textContent = 'Ignorer et continuer le quiz';
+                  break;
+              }
+              nextBtn.className = 'btn-next bg-blue-600 text-white py-2 px-4 rounded';
+              nextBtn.addEventListener('click', gotoNextSlide);
+              navDiv.appendChild(nextBtn);
+
+              contentDiv.appendChild(navDiv);
+            }
+          }
+          break;
+
+        case 'result':
+          {
+            const finalScore = computeScore();
+            const range = getScoreRange(finalScore);
+
+            const resultTitle = document.createElement('h2');
+            resultTitle.className = 'text-3xl font-bold';
+            resultTitle.textContent = range.title;
+            contentDiv.appendChild(resultTitle);
+
+
+            const resultSubTitle = document.createElement('h3');
+            resultSubTitle.className = 'text-2xl mt-4 mb-4 text-gray-700';
+            resultSubTitle.textContent = `Votre score : ${finalScore} bonnes réponses sur ${quizConfig.slides.filter(s => s.type === 'question').length}`;
+            contentDiv.appendChild(resultSubTitle);
+
+            const resultMsg = document.createElement('p');
+            resultMsg.textContent = range.message;
+            resultMsg.className = 'text-xl';
+            contentDiv.appendChild(resultMsg);
+
+            const restartBtn = document.createElement('button');
+            restartBtn.textContent = 'Recommencer';
+            restartBtn.className = 'mt-4 btn-next bg-blue-600 text-white py-2 px-4 rounded';
+            restartBtn.addEventListener('click', () => {
+              currentSlideIndex = 0;
+              for (let key in userAnswers) {
+                delete userAnswers[key];
+              }
+              renderSlide(quizConfig.slides[currentSlideIndex]);
+            });
+            contentDiv.appendChild(restartBtn);
+          }
+          break;
+      }
+
+      container.appendChild(slideDiv);
+    }
+
+    /**************************************************************
+     * CALCUL DU SCORE FINAL
+     **************************************************************/
+    function computeScore() {
+      let score = 0;
+      quizConfig.slides.forEach(slide => {
+        if (slide.type === 'question') {
+          const qId = slide.id;
+          const userChoice = userAnswers[qId];
+          if (userChoice !== undefined) {
+            if (slide.answers[userChoice].isCorrect) {
+              score++;
+            }
+          }
+        }
+      });
+      return score;
+    }
+
+    /**************************************************************
+     * TROUVER LE PALIER DE SCORE
+     **************************************************************/
+    function getScoreRange(score) {
+      const found = quizConfig.scoreRanges.find(r => score >= r.minScore && score <= r.maxScore);
+      return found || { title: "Score inconnu", message: "Aucun texte adapté." };
+    }
+
+    /**************************************************************
+     * EXEMPLE DE FONCTION CALLBACK
+     **************************************************************/
+    function subscribeNewsletter() {
+      alert("Vous allez être redirigé vers la page d'inscription à la newsletter !");
+      window.location.href = 'https://exemple.fr/newsletter';
+    }
+
+    /**************************************************************
+     * INITIALISATION DU QUIZ
+     **************************************************************/
+    renderSlide(quizConfig.slides[currentSlideIndex]);
+  </script>
+</body>
+</html>

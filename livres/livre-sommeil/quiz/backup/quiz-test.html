@@ -1,11 +1,11 @@
 ---
-layout: quiz
-title: L'enfant dormira bientôt, et vous aussi - Quiz 4 - Les solutions du sommeil
+layout: quiz_template
+title: Quiz avec Image dimensionnable
 quiz_config:
   slides:
     - type: "intro"
-      title: "L'enfant dormira bientôt, et vous aussi"
-      subtitle: "Quiz 4 - Les solutions du sommeil"
+      title: "L'enfant dormira bientôt, et vous aussi - Quiz 3"
+      subtitle: "Les solutions du sommeil"
       image: "/images/livre-sommeil.png"
       content: "Ce quiz est conçu pour évaluer et approfondir vos connaissances sur les pratiques de sommeil sécurisées et efficaces pour les enfants. À travers diverses questions, vous découvrirez des informations essentielles sur les rituels de coucher, les objets transitionnels, les bienfaits du cododo en sécurité, et les mesures de prévention contre la mort inattendue du nourrisson. Préparez-vous à enrichir vos compétences pour offrir un environnement de sommeil optimal à votre enfant !"
       imageWidth: "300px"
@@ -57,19 +57,22 @@ quiz_config:
         - text: "Vers 8 mois"
           isCorrect: true
     - type: "promo"
-      title: "Profitez de notre diagnositque gratuit"
-      subtitle: "Obtenez un plan d’action personnalisé pour améliorer le bien-être de toute la famille"
-      content: "Profitez dès maintenant de notre diagnostic gratuit. Évaluez votre sommeil, votre allaitement et votre épuisement parental. Passez à l’action dès aujourd’hui !"
+      title: "Page promo : Nos ateliers en ligne"
+      subtitle: "Sous‐titre promo"
+      content: "Bénéficiez d'une séance gratuite pour aller plus loin !"
       actions:
-        - label: "Réaliser mon diagnostic maintenant"
+        - label: "Je m'abonne à la newsletter"
           element: "button"
+          actionType: "callback"
+          functionName: "subscribeNewsletter"
+        - label: "Visiter notre site"
           element: "link"
           actionType: "link"
-          url: "https://www.la-voie-des-parents.fr/diagnostic/diagnostic-offert/"
+          url: "https://exemple.fr"
           target: "_blank"
-      image: ""
-      imageWidth: ""
-      imageHeight: ""
+      image: "https://via.placeholder.com/200x250?text=Promo"
+      imageWidth: "200px"
+      imageHeight: "250px"
     - type: "question"
       id: 5
       title: "Les bienfaits du Cododo en sécurité"

@@ -3,6 +3,7 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: base
+title: La librairie des parents - un site de la voie des parents
 permalink: /
 hero: |
     <style>

@@ -3,7 +3,7 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: base
-
+permalink: /
 hero: |
     <style>
         @media (max-width: 768px) {

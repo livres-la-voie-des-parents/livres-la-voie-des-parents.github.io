@@ -3,7 +3,19 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: base
-title: La librairie des parents - un site de la voie des parents
+title: "La librairie des parents - Livres pour accompagner les jeunes parents"
+description: "Découvrez une sélection de livres pratiques et bienveillants pour accompagner les jeunes parents dans le sommeil, l’éducation et le bien-être de leur enfant."
+keywords: "livres parentalité, sommeil bébé, éducation bienveillante, accompagnement parental, guides pratiques, jeunes parents, relation parent-enfant"
+author: "La Voie des Parents"
+og_title: "La Voie des Parents - Des livres pour guider les parents"
+og_description: "Parcourez notre collection de livres spécialisés pour aider les parents à mieux comprendre et accompagner leurs enfants, du sommeil à l’éducation."
+og_image: "{{ site.url }}/images/livre-sommeil.png"
+og_url: "https://livres.la-voie-des-parents.fr/"
+og_type: "website"
+twitter_card: "summary_large_image"
+twitter_title: "La Voie des Parents - Des livres pour guider les parents"
+twitter_description: "Découvrez des livres conçus pour accompagner les parents dans les défis du quotidien : sommeil, éducation, bien-être et parentalité."
+twitter_image: "{{ site.url }}/images/livre-sommeil.png"
 permalink: /
 hero: |
     <style>

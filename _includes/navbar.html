@@ -4,7 +4,7 @@
       <div class="flex">
         <div class="flex-shrink-0 flex items-center">
           <img class="h-8 w-auto" src="/images/logo.webp" alt="Logo">
-          <h1 class="text-2xl ml-4 font-bold text-gray-900">La Librairie des Parents</h1>
+          <h1 class="text-2xl ml-4 font-bold text-gray-900">{% if page.navbar_title %}{{ page.navbar_title }}{% else %}La Librairie des Parents{% endif %}</h1>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
           <a href="{{ site.baseurl }}/" class="{% if page.permalink == '/' %}border-b-2 border-indigo-500 {% endif %}text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">Accueil</a>
